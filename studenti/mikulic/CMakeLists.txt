@@ -25,6 +25,10 @@ add_executable(mikulic
             vertexbufferlayout.cpp vertexbufferlayout.h
             vertexarray.cpp vertexarray.h
             renderer.cpp renderer.h
+            pipe.h pipe.cpp
+            plane.h plane.cpp
+            line.h line.cpp
+            matrices.h matrices.cpp
             mikulic.cpp
             )
 
