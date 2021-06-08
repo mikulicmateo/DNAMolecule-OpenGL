@@ -29,8 +29,10 @@ add_executable(mikulic
             plane.h plane.cpp
             line.h line.cpp
             matrices.h matrices.cpp
+            texture.h texture.cpp
+            camera.h
             mikulic.cpp
-            )
+        animation.h)
 
 target_include_directories(mikulic PRIVATE
             ${PROJECT_SOURCE_DIR}/third_party/glfw-3.3.2/include/
