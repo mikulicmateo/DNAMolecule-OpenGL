@@ -1,6 +1,6 @@
 ##Opis programa:
 
-![Screenshot molekule](https://ibb.co/gwT6sZ4)
+![Screenshot molekule](https://i.ibb.co/rM6vn2d/dna-opengl.png)
 
 Program prikazuje molekulu DNA čiji materijal simulira sjajnu plastiku, a napravljena je pomoću cjevčica.
 
