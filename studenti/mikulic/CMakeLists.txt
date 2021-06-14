@@ -29,9 +29,7 @@ add_executable(mikulic
             plane.h plane.cpp
             line.h line.cpp
             matrices.h matrices.cpp
-            texture.h texture.cpp
-            camera.h
-            mikulic.cpp
+        mikulic.cpp
         animation.h)
 
 target_include_directories(mikulic PRIVATE

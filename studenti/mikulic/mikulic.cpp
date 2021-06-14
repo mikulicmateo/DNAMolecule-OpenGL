@@ -17,7 +17,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "camera.h"
+
 #include "indexbuffer.h"
 #include "line.h"
 #include "matrices.h"
@@ -25,11 +25,11 @@
 #include "plane.h"
 #include "renderer.h"
 #include "shader.h"
-#include "texture.h"
 #include "vertexarray.h"
 #include "vertexbuffer.h"
 #include "vertexbufferlayout.h"
 #include "animation.h"
+
 
 //maknuti iz .gitignore sve foldere prije predaje!!!!!!!!!!!
 const unsigned int SCR_WIDTH = 1024;
@@ -153,60 +153,69 @@ std::vector<glm::vec3> generate_helix(float length, float step){
     return generated;
 }
 
-void drawNucleotides(std::vector<glm::vec3> helix1, std::vector<glm::vec3> helix2, VertexBufferLayout &layout, Shader pipe_shader){
-    const std::vector<glm::vec3> base_circle = build_circle(0.012f, 32);
+void draw_nucleotides(std::vector<glm::vec3> helix1, std::vector<glm::vec3> helix2,
+                     VertexBufferLayout &layout, Shader pipe_shader){
+    const std::vector<glm::vec3> base_circle = build_circle(0.01f, 32);
 
-    for(int i=2;i<helix1.size() && i<helix2.size();i+=2){
+
+    for(unsigned int i=2;i<helix1.size() && i<helix2.size();i+=2){
+
 
         std::vector<glm::vec3> path = {helix1[i],glm::vec3(0,helix2[i].y,0)};
         std::vector<glm::vec3> path2 = {glm::vec3(0,helix2[i].y,0), helix2[i]};
+
         Pipe pipe_nucleotide,pipe_nucleotide2;
+
         pipe_nucleotide.set(path,base_circle);
         pipe_nucleotide2.set(path2,base_circle);
+
         VertexBuffer vb(pipe_nucleotide.getInterleavedVertices());
         VertexBuffer vb2(pipe_nucleotide2.getInterleavedVertices());
         VertexArray va,va2;
+
         va.addBuffer(vb,layout);
         va2.addBuffer(vb2,layout);
+
         IndexBuffer ib(pipe_nucleotide.getIndices());
         IndexBuffer ib2(pipe_nucleotide2.getIndices());
 
         glm::vec3 color1,color2;
         switch (i%8)
         {
-            case 0://timin
+            case 0:
                 color1 = TIMIN;
                 color2 = ADENIN;
                 break;
-            case 1://adenin
+            case 1:
                 color1 = ADENIN;
                 color2 = TIMIN;
                 break;
-            case 2://citozin
+            case 2:
                 color1 = CITOZIN;
                 color2 = GUANIN;
                 break;
-            case 3://guanin
+            case 3:
                 color1 = GUANIN;
                 color2 = CITOZIN;
                 break;
-            case 4://timin
+            case 4:
                 color1 = ADENIN;
                 color2 = TIMIN;
                 break;
-            case 5://adenin
+            case 5:
                 color1 = TIMIN;
                 color2 =ADENIN;
                 break;
-            case 6://citozin
+            case 6:
                 color1 = GUANIN;
                 color2 = CITOZIN;
                 break;
-            case 7://guanin
+            case 7:
                 color1 = CITOZIN;
                 color2 = GUANIN;
                 break;
         }
+
         pipe_shader.setVec3("objectColor",color1);
         Renderer::drawTriangleStrip(va, ib,pipe_shader);
 
@@ -215,10 +224,11 @@ void drawNucleotides(std::vector<glm::vec3> helix1, std::vector<glm::vec3> helix
     }
 
 }
-Camera camera(glm::vec3(0.f,0.f,5.f));
+
 Animation animation;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+
     if (key == GLFW_KEY_R && action == GLFW_PRESS)
     {
         //        camera.ProcessKeyboard(BACKWARD,0.1);
@@ -226,19 +236,27 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         glfwSetTime(animation.get_time());
     }
 
-
     if (key == GLFW_KEY_E && action == GLFW_PRESS)
     {
         animation.enable_animation(false);
         animation.set_time(glfwGetTime());
     }
+
+    if(key == GLFW_KEY_W && action == GLFW_PRESS)
+    {
+        animation.zoom(-0.05);
+    }
+
+    if(key == GLFW_KEY_S && action == GLFW_PRESS)
+    {
+        animation.zoom(0.05);
+    }
+
+    if(key == GLFW_KEY_A && action == GLFW_PRESS){
+        animation.set_autoZoom(!animation.get_autoZoom());
+    }
 }
-//bool enable_animation(bool enable)
-//float[] animation_controller(){
-//    if(enable){
-//
-//    }
-//}
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 int main(void)
@@ -276,12 +294,7 @@ int main(void)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     std::cout << "shaders folder: " << shaders_folder << std::endl;
-    const std::string t_vs = shaders_folder + "vert.glsl";
-    const std::string t_fs = shaders_folder + "frag.glsl";
 
-    ///////////////////////////////PROFESOROV KOD//////////////////////////////////////////////////////
-//    std::vector<glm::vec3> b00_pts{glm::vec3(-1.0f,-1.0f,0),glm::vec3(0, -1.0, 1), glm::vec3(0.1, -0.1, 0),
-//                                   glm::vec3(0.0, 0.1, 0), glm::vec3(-0.9, 0.9, 1), glm::vec3 (0,0.7,0)};
     std::vector<glm::vec3> b00_pts = generate_helix(1, 0.1);
     std::vector<glm::vec3> b01_pts = generate_helix(-1,0.1);
     unsigned int pt_num{60};
@@ -297,11 +310,11 @@ int main(void)
     const std::vector<glm::vec3> bez_path_data = generate_bez_line(b00_pts, pt_num);
     const std::vector<glm::vec3> bez_path_data1 = generate_bez_line(b01_pts, pt_num);
 
-    std::cout << bez_path_data.size() << std::endl;
-    // sectional contour of helix_pipe1
-    const std::vector<glm::vec3> circle = build_circle(0.02f, 32); // radius, segments
+
+    const std::vector<glm::vec3> circle = build_circle(0.015f, 32); // radius, segments
+
     helix_pipe1.set(bez_path_data, circle);
-    helix_pipe2.set(bez_path_data1,circle);
+    helix_pipe2.set(bez_path_data1, circle);
 
     VertexBuffer pipe_vb(helix_pipe1.getInterleavedVertices());
     VertexBuffer pipe_vb1(helix_pipe2.getInterleavedVertices());
@@ -319,9 +332,7 @@ int main(void)
     IndexBuffer pipe_ib(helix_pipe1.getIndices());
     IndexBuffer pipe_ib1(helix_pipe2.getIndices());
 
-
-    const glm::vec3 sphereColor(0.894 , 0.894 , 0.631);
-    //sphereColor = glm::vec3(1.f,1.f,1.f) * sphereColor;
+    const glm::vec3 objectColor(0.894 , 0.894 , 0.631);
     const glm::vec3 lightColor(1., 1., 1.);
     const glm::vec3 ambientMaterial(0.4f,0.4f,0.4f);
     const glm::vec3 specularMaterial(0.7f,0.7f,0.7f);
@@ -330,8 +341,8 @@ int main(void)
     const glm::vec3 lightAmbient(0.5f, 0.5f, 0.5f);
     const glm::vec3 lightDiffuse(1.f, 1.f, 1.f);
     const glm::vec3 lightSpecular(1.0f, 1.0f, 1.0f);
-    float radius = 3.5;
-    //////////////////////////////////////////////////////////////////////////////////////////////
+    float radius;
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -340,38 +351,35 @@ int main(void)
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             Renderer::clear();
 
-            if(radius<2.19){
-                radius = 2.19;
-            }
+            radius = animation.get_radius();
+
             glm::mat4 view = glm::mat4(1.0f);
             glm::mat4 projection = glm::mat4(1.0f);
-            float camX   = sin(0.5 *glfwGetTime()) * 3;
-            float camZ   = cos(0.5 *glfwGetTime()) * 3;
-            glm::vec3 lightPos(camX, 1, camZ);
-            glm::vec3 view_position = glm::vec3(0.f, 1.0f, 3.f);
-//            view_position = glm::vec3(camX, 1.0f, camZ);
-//            view = glm::lookAt(view_position,
-//                               glm::vec3(0.0f, 0.0f, 0.0f),
-//                               glm::vec3(0.0f, 1.0f, 0.0f));
-//            view = camera.GetViewMatrix();
+            float camX;
+            float camZ;
+
+            glm::vec3 lightPos;
+            glm::vec3 view_position;
 
             if(animation.get_status()){
 
                 camX = sin(0.5 * glfwGetTime()) * radius;
                 camZ = cos(0.5 * glfwGetTime()) * radius;
-                radius -=0.008;
+                if(animation.get_autoZoom()){
+                    animation.zoom(-0.008);
+                }
+
                 view_position = glm::vec3(camX, 1.1f, camZ);
                 lightPos = glm::vec3(camX, 1.5, camZ);
-//                camera.ProcessKeyboard(RIGHT,0.1);
-//                animation.set_time(glfwGetTime());
-//                view_position = glm::vec3(camX, 1.0f, camZ);
+
             }else{
-//                view = camera.GetViewMatrix();
+
                 camX = sin(0.5 * animation.get_time()) * radius;
                 camZ = cos(0.5 * animation.get_time()) * radius;
                 view_position = glm::vec3(camX, 1.1f, camZ);
                 lightPos = glm::vec3(camX, 1.5, camZ);
             }
+
 
             view = glm::lookAt(view_position,
                                glm::vec3(0.0f, 0.0f, 0.0f),
@@ -385,25 +393,32 @@ int main(void)
             pipe_shader.setMat4("view", view);
             pipe_shader.setMat4("proj", projection);
 
-            pipe_shader.setVec3("objectColor", sphereColor);
+
+            pipe_shader.setVec3("objectColor", objectColor);
+
             pipe_shader.setVec3("light.ambient", lightAmbient);
             pipe_shader.setVec3("light.position", lightPos);
             pipe_shader.setVec3("light.specular",lightSpecular);
             pipe_shader.setVec3("light.diffuse",lightDiffuse);
+
             pipe_shader.setVec3("viewPos", view_position);
+
             pipe_shader.setFloat("material.shininess",256.f);
             pipe_shader.setVec3("material.ambient",ambientMaterial);
             pipe_shader.setVec3("material.diffuse",diffuseMaterial);
             pipe_shader.setVec3("material.specular",specularMaterial);
+
             Renderer::drawTriangleStrip(pipe_va, pipe_ib, pipe_shader);
             Renderer::drawTriangleStrip(pipe_va1,pipe_ib1,pipe_shader);
-            drawNucleotides(bez_path_data,bez_path_data1,pipe_layout,pipe_shader);
+
+            draw_nucleotides(bez_path_data, bez_path_data1, pipe_layout, pipe_shader);
+
+            glfwSetKeyCallback(window,key_callback);
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
 
             /* Poll for and process events */
             glfwPollEvents();
-            glfwSetKeyCallback(window,key_callback);
     }
 
     glfwTerminate();
