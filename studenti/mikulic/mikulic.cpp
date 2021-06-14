@@ -30,8 +30,6 @@
 #include "vertexbufferlayout.h"
 #include "animation.h"
 
-
-//maknuti iz .gitignore sve foldere prije predaje!!!!!!!!!!!
 const unsigned int SCR_WIDTH = 1024;
 const unsigned int SCR_HEIGHT = 768;
 
@@ -85,13 +83,13 @@ float binomial(long n, long i)
 
 float bernstein(long i, long n, float t)
 {
-    double r = binomial(n, i);
+    float r = binomial(n, i);
     r*= std::pow(1-t, n-i);
     r*=std::pow(t, i);
     return r;
 }
 
-glm::vec3 calc_pt(const std::vector<glm::vec3>& ctrl_pts, const double& t)
+glm::vec3 calc_pt(const std::vector<glm::vec3>& ctrl_pts, const float& t)
 {
     glm::vec3 pt(0);
     for(size_t i=0; i<ctrl_pts.size(); ++i)
@@ -113,25 +111,6 @@ std::vector<glm::vec3> generate_bez_line(const std::vector<glm::vec3>& ctrl_pts,
         curve_points.emplace_back(pt);
     }
     return curve_points;
-}
-std::vector<float> generate_bez_line(const std::vector<glm::vec3>& ctrl_pts,
-                                     const unsigned int& pts_num,
-                                     const glm::vec3& color)
-{
-    const std::vector<glm::vec3> curve_points = generate_bez_line(ctrl_pts, pts_num);
-
-    std::vector<float>data;
-    for(size_t i=0; i<curve_points.size(); ++i)
-    {
-        data.emplace_back(curve_points[i].x);
-        data.emplace_back(curve_points[i].y);
-        data.emplace_back(curve_points[i].z);
-
-        data.emplace_back(color.x);
-        data.emplace_back(color.y);
-        data.emplace_back(color.z);
-    }
-    return data;
 }
 
 std::vector<glm::vec3> generate_helix(float length, float step){
@@ -231,7 +210,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     if (key == GLFW_KEY_R && action == GLFW_PRESS)
     {
-        //        camera.ProcessKeyboard(BACKWARD,0.1);
         animation.enable_animation(true);
         glfwSetTime(animation.get_time());
     }
@@ -332,8 +310,8 @@ int main(void)
     IndexBuffer pipe_ib(helix_pipe1.getIndices());
     IndexBuffer pipe_ib1(helix_pipe2.getIndices());
 
-    const glm::vec3 objectColor(0.894 , 0.894 , 0.631);
-    const glm::vec3 lightColor(1., 1., 1.);
+    const glm::vec3 objectColor(0.894f, 0.894f, 0.631f);
+    const glm::vec3 lightColor(1.f, 1.f, 1.f);
     const glm::vec3 ambientMaterial(0.4f,0.4f,0.4f);
     const glm::vec3 specularMaterial(0.7f,0.7f,0.7f);
     const glm::vec3 diffuseMaterial(0.55f,0.55f,0.55f);
@@ -363,21 +341,21 @@ int main(void)
 
             if(animation.get_status()){
 
-                camX = sin(0.5 * glfwGetTime()) * radius;
-                camZ = cos(0.5 * glfwGetTime()) * radius;
+                camX = sin(0.5f * glfwGetTime()) * radius;
+                camZ = cos(0.5f * glfwGetTime()) * radius;
                 if(animation.get_autoZoom()){
-                    animation.zoom(-0.008);
+                    animation.zoom(-0.008f);
                 }
 
                 view_position = glm::vec3(camX, 1.1f, camZ);
-                lightPos = glm::vec3(camX, 1.5, camZ);
+                lightPos = glm::vec3(camX, 1.5f, camZ);
 
             }else{
 
-                camX = sin(0.5 * animation.get_time()) * radius;
-                camZ = cos(0.5 * animation.get_time()) * radius;
+                camX = sin(0.5f * animation.get_time()) * radius;
+                camZ = cos(0.5f * animation.get_time()) * radius;
                 view_position = glm::vec3(camX, 1.1f, camZ);
-                lightPos = glm::vec3(camX, 1.5, camZ);
+                lightPos = glm::vec3(camX, 1.5f, camZ);
             }
 
 
@@ -389,7 +367,7 @@ int main(void)
                                           0.1f, 100.0f);
 
             pipe_shader.bind();
-            pipe_shader.setMat4("model", glm::mat4(1));
+            pipe_shader.setMat4("model", glm::mat4(1.f));
             pipe_shader.setMat4("view", view);
             pipe_shader.setMat4("proj", projection);
 
